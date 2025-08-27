@@ -5,7 +5,6 @@ import React, { createContext, FC, ReactNode, useContext, useEffect, useState } 
 
 type UserType = 'resident' | 'business_owner' | 'admin' | 'visitor';
 
-// [핵심 수정] AuthContextType에서 loginAsGuest 타입을 삭제합니다.
 interface AuthContextType {
   isLoggedIn: boolean;
   userType: UserType;
@@ -13,6 +12,7 @@ interface AuthContextType {
   login: (jwt: string, type: UserType) => Promise<void>;
   logout: () => Promise<void>;
   selectUserType: (type: UserType) => Promise<void>;
+  loginAsGuest: (type: UserType) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -60,8 +60,17 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // [핵심 수정] loginAsGuest 함수를 완전히 삭제합니다.
-  
+  const loginAsGuest = async (type: UserType) => {
+    try {
+      // 게스트 로그인 시에는 JWT 토큰 없이 사용자 타입만 설정
+      await AsyncStorage.setItem('userType', type);
+      setIsLoggedIn(true);
+      setUserType(type);
+    } catch (e) {
+      console.error("AsyncStorage에 사용자 유형 저장 실패", e);
+    }
+  };
+
   const selectUserType = async (type: UserType) => {
     if (type === 'business_owner' || type === 'resident') {
         try {
@@ -80,7 +89,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     selectUserType,
-    // [핵심 수정] value 객체에서 loginAsGuest를 삭제합니다.
+    loginAsGuest,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

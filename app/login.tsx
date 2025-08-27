@@ -8,8 +8,7 @@ import { apiClient } from '../services/api';
 
 const LoginScreen = () => {
   const router = useRouter();
-  // [핵심 수정] useAuth에서 loginAsGuest를 더 이상 가져오지 않습니다.
-  const { login } = useAuth();
+  const { login, loginAsGuest } = useAuth();
 
   const [email, setEmail] = useState('string');
   const [password, setPassword] = useState('string');
@@ -40,15 +39,23 @@ const LoginScreen = () => {
       
       await login(accessToken, userType);
 
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : '로그인 중 오류가 발생했습니다.';
+      setError(message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // [핵심 수정] 비회원 로그인 버튼과 핸들러 함수를 모두 삭제합니다.
-  // const handleGuestLogin = () => { ... };
+  const handleGuestLogin = async (userType: 'resident' | 'business_owner') => {
+    try {
+      await loginAsGuest(userType);
+      // 게스트 로그인 성공 시 메인 화면으로 이동
+      router.push('/(tabs)');
+    } catch (error) {
+      setError('게스트 로그인 중 오류가 발생했습니다.');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -62,7 +69,16 @@ const LoginScreen = () => {
           {isLoading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>로그인</Text>}
         </TouchableOpacity>
         
-        {/* [핵심 수정] 비회원으로 둘러보기 버튼 UI를 삭제합니다. */}
+        {/* 게스트 로그인 버튼들 */}
+        <View style={styles.guestContainer}>
+          <Text style={styles.guestText}>또는</Text>
+          <TouchableOpacity style={styles.guestButton} onPress={() => handleGuestLogin('resident')}>
+            <Text style={styles.guestButtonText}>주민으로 둘러보기</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.guestButton} onPress={() => handleGuestLogin('business_owner')}>
+            <Text style={styles.guestButtonText}>소상공인으로 둘러보기</Text>
+          </TouchableOpacity>
+        </View>
         
         <TouchableOpacity onPress={() => router.push('/register')}>
           <Text style={styles.registerText}>계정이 없으신가요? <Text style={styles.registerLink}>회원가입</Text></Text>
@@ -72,7 +88,6 @@ const LoginScreen = () => {
   );
 };
 
-// [핵심 수정] 비회원 버튼 스타일(guestButton)을 삭제합니다.
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center' },
     content: { width: '85%', alignItems: 'center' },
@@ -82,6 +97,20 @@ const styles = StyleSheet.create({
     button: { width: '100%', paddingVertical: 15, borderRadius: 12, backgroundColor: '#2F80ED', justifyContent: 'center', alignItems: 'center', marginTop: 10 },
     buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
     errorText: { color: 'red', marginVertical: 10, textAlign: 'center' },
+    guestContainer: { marginTop: 20, alignItems: 'center' },
+    guestText: { color: '#828282', marginBottom: 15, fontSize: 14 },
+    guestButton: { 
+      width: '100%', 
+      paddingVertical: 12, 
+      borderRadius: 10, 
+      backgroundColor: '#F2F2F7', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: '#E0E0E0'
+    },
+    guestButtonText: { color: '#666', fontSize: 14, fontWeight: '500' },
     registerText: { color: '#828282', marginTop: 20 },
     registerLink: { color: '#2F80ED', fontWeight: 'bold' },
 });

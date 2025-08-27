@@ -32,8 +32,6 @@ export default function MyCoursesScreen() {
 
     useFocusEffect(
         useCallback(() => {
-            console.log(`my-courses 화면 포커스됨: '${selectedTab}' 탭 데이터 갱신`);
-            
             if (selectedTab === 'my') {
                 const formattedMyCourses = myCoursesFromData.map(c => ({
                     id: c.id,

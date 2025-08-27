@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import axios from 'axios';
+import { apiClient } from '../../services/api';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -75,21 +75,16 @@ export default function PlaceSearchScreen() {
 
     setLoading(true);
     try {
-      const url = keyword.trim()
-        ? `http://3.35.27.124:8080/places?keyword=${encodeURIComponent(keyword.trim())}`
-        : `http://3.35.27.124:8080/places`;
+      const endpoint = keyword.trim()
+        ? `/places?keyword=${encodeURIComponent(keyword.trim())}`
+        : `/places`;
 
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      });
-      console.log('서버 응답:', response.data);
+      const responseData = await apiClient(endpoint, { method: 'GET' });
 
-      const placesArray = Array.isArray(response.data)
-        ? response.data
-        : Array.isArray(response.data.data)
-        ? response.data.data
+      const placesArray = Array.isArray(responseData)
+        ? responseData
+        : Array.isArray(responseData.data)
+        ? responseData.data
         : [];
 
       const transformedPlaces: Place[] = placesArray.map((place: any) => ({
@@ -101,7 +96,6 @@ export default function PlaceSearchScreen() {
 
       setPlaces(transformedPlaces);
     } catch (error) {
-      console.error('장소 데이터 불러오기 실패:', error);
       setPlaces([]);
     } finally {
       setLoading(false);

@@ -4,10 +4,19 @@
     "jsx": "react-native",
     "allowJs": true,
     "strict": true,
-    "esModuleInterop": true, // 👈 이 줄을 추가해주세요!
+    "esModuleInterop": true,
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@/navigation/*": [
+        "./navigation/*"
+      ],
+      "@/screens/*": [
+        "./screens/*"
+      ],
+      "@/contexts/*": [
+        "./contexts/*"
       ]
     }
   },
@@ -15,6 +24,18 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-, "navigation/TabNavigator.jsx", "navigation/TabNavigator.jsx", "screens/MyCollectionPage/mypage.tsx", "screens/MyCollectionPage/my-reviews.jsx", "screens/MyCollectionPage/app-setting.jsx", "screens/MyCollectionPage/my-courses.tsx", "screens/MyCollectionPage/edit-profile.jsx", "screens/MyCollectionPage/account-settings.jsx"  ]
+    "expo-env.d.ts",
+    "navigation/TabNavigator.jsx",
+    "screens/MyCollectionPage/mypage.tsx",
+    "screens/MyCollectionPage/my-reviews.jsx",
+    "screens/MyCollectionPage/app-setting.jsx",
+    "screens/MyCollectionPage/my-courses.tsx",
+    "screens/MyCollectionPage/edit-profile.jsx",
+    "screens/MyCollectionPage/account-settings.jsx",
+    "screens/Places/PlaceWriteScreen.jsx",
+    "screens/Places/PhotoSelectScreen.jsx",
+    "screens/MyCollectionPage/MapCourseScreen.jsx",
+    "screens/MyCollectionPage/PlaceDetailScreen.jsx",
+    "screens/NotFoundScreen.jsx"
+  ]
 }

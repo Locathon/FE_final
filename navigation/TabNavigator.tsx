@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 
 // 네비게이터들을 import 합니다.
-import { useAuth } from '../contexts/AuthContext'; // ⭐️ AuthContext에서 useAuth 훅을 가져옵니다.
+import { useAuth } from '@/contexts/AuthContext'; // ⭐️ AuthContext에서 useAuth 훅을 가져옵니다.
 import BusinessNavigator from './BusinessNavigator';
 import BusinessNavigator_user from './BusinessNavigator_user';
 import CommunityNavigator from './CommunityNavigator';

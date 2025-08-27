@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import axios from 'axios';
+import { apiClient } from '../../services/api';
 import React, { useEffect, useState } from 'react';
 import {
   FlatList,
@@ -67,18 +67,13 @@ export default function PlaceListScreen() {
   useEffect(() => {
     if (!jwtToken) return;
 
-    axios
-      .get('http://3.35.27.124:8080/places', {
-        headers: {
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      })
-      .then(res => {
-        // 두 브랜치의 안정적인 데이터 처리 로직을 결합
-        const placesFromApi = Array.isArray(res.data)
-          ? res.data
-          : Array.isArray(res.data.data)
-          ? res.data.data
+    const fetchPlaces = async () => {
+      try {
+        const responseData = await apiClient('/places', { method: 'GET' });
+        const placesFromApi = Array.isArray(responseData)
+          ? responseData
+          : Array.isArray(responseData.data)
+          ? responseData.data
           : [];
 
         const apiPlaces: Place[] = placesFromApi.map((place: any) => ({
@@ -91,10 +86,12 @@ export default function PlaceListScreen() {
               : require('../../assets/images/flying_suwon.jpg'),
         }));
         setPlaces(apiPlaces);
-      })
-      .catch(err => {
-        console.error('장소 불러오기 실패:', err);
-      });
+      } catch (_err) {
+        setPlaces([]);
+      }
+    };
+
+    fetchPlaces();
   }, [jwtToken]);
 
   const renderPlaceItem = ({ item }: { item: Place }) => (
@@ -122,7 +119,6 @@ export default function PlaceListScreen() {
       <TouchableOpacity
         style={styles.heartIcon}
         activeOpacity={0.7}
-        onPress={() => console.log(`하트 클릭: ${item.id}`)}
       >
         <Ionicons name="heart-outline" size={26} color="#ff3b30" />
       </TouchableOpacity>

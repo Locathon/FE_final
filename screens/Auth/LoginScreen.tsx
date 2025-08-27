@@ -12,7 +12,7 @@ type NavigationProp = {
 
 const LoginScreen = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { login } = useAuth();
+  const { login, loginAsGuest } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -60,11 +60,22 @@ const LoginScreen = () => {
       // 백엔드 ROLE (e.g., RESIDENT)을 프론트엔드 타입 (e.g., resident)으로 변환
       await login(accessToken, userType);
 
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : '로그인 중 오류가 발생했습니다.';
+      setError(message);
       setIsLoading(false);
     }
     // 성공 시에는 isLoading을 false로 바꿀 필요 없음. 화면이 전환되기 때문.
+  };
+
+  const handleGuestLogin = async (userType: 'resident' | 'business_owner') => {
+    try {
+      await loginAsGuest(userType);
+      // 게스트 로그인 성공 시 메인 화면으로 이동
+      navigation.navigate('Main');
+    } catch (error) {
+      setError('게스트 로그인 중 오류가 발생했습니다.');
+    }
   };
 
   return (
@@ -106,6 +117,17 @@ const LoginScreen = () => {
           )}
         </TouchableOpacity>
         
+        {/* 게스트 로그인 버튼들 */}
+        <View style={styles.guestContainer}>
+          <Text style={styles.guestText}>또는</Text>
+          <TouchableOpacity style={styles.guestButton} onPress={() => handleGuestLogin('resident')}>
+            <Text style={styles.guestButtonText}>주민으로 둘러보기</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.guestButton} onPress={() => handleGuestLogin('business_owner')}>
+            <Text style={styles.guestButtonText}>소상공인으로 둘러보기</Text>
+          </TouchableOpacity>
+        </View>
+        
         <TouchableOpacity onPress={() => Alert.alert("회원가입", "회원가입 기능은 아직 준비 중입니다.")}>
           <Text style={styles.registerText}>계정이 없으신가요? <Text style={styles.registerLink}>회원가입</Text></Text>
         </TouchableOpacity>
@@ -123,6 +145,20 @@ const styles = StyleSheet.create({
   button: { width: '100%', paddingVertical: 15, borderRadius: 12, backgroundColor: '#2F80ED', justifyContent: 'center', alignItems: 'center', marginVertical: 10 },
   buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
   errorText: { color: 'red', marginBottom: 10 },
+  guestContainer: { marginTop: 20, alignItems: 'center' },
+  guestText: { color: '#828282', marginBottom: 15, fontSize: 14 },
+  guestButton: { 
+    width: '100%', 
+    paddingVertical: 12, 
+    borderRadius: 10, 
+    backgroundColor: '#F2F2F7', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#E0E0E0'
+  },
+  guestButtonText: { color: '#666', fontSize: 14, fontWeight: '500' },
   registerText: { color: '#828282', marginTop: 20 },
   registerLink: { color: '#2F80ED', fontWeight: 'bold' },
 });
